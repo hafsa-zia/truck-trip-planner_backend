@@ -23,27 +23,50 @@ class TripView(APIView):
                 trip.pickup_location,
                 trip.dropoff_location
             )
+            if route is None:
 
+                return Response(
+        {
+            "error":
+            "One or more locations could not be found. Please check the spelling and try again."
+        },
+        status=400
+    )
             hos = calculate_hos(
                 route["distance"],
                 route["duration"],
                 trip.current_cycle_used
             )
 
-            
             logs = generate_logs(
                 route["duration"]
-)
+            )
 
             return Response({
+
                 "trip_id": trip.id,
+
                 "distance": route["distance"],
                 "duration": route["duration"],
+
                 "coordinates": route["coordinates"],
+
+                "current_coordinates":
+                    route["current_coordinates"],
+
+                "pickup_coordinates":
+                    route["pickup_coordinates"],
+
+                "dropoff_coordinates":
+                    route["dropoff_coordinates"],
+
                 "total_days": hos["total_days"],
                 "stops": hos["stops"],
                 "logs": logs
-                
+
             })
 
-        return Response(serializer.errors, status=400)
+        return Response(
+            serializer.errors,
+            status=400
+        )

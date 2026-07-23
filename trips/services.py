@@ -14,8 +14,10 @@ def get_coordinates(place):
     )
 
     response = requests.get(url)
-
     data = response.json()
+
+    if not data["features"]:
+        return None
 
     return data["features"][0]["geometry"]["coordinates"]
 
@@ -24,7 +26,12 @@ def get_route_data(current, pickup, dropoff):
     current_coords = get_coordinates(current)
     pickup_coords = get_coordinates(pickup)
     dropoff_coords = get_coordinates(dropoff)
-
+    if (
+    current_coords is None or
+    pickup_coords is None or
+    dropoff_coords is None
+    ):
+        return None 
     url = (
         "https://api.geoapify.com/v1/routing?"
         f"waypoints="
@@ -37,17 +44,29 @@ def get_route_data(current, pickup, dropoff):
     response = requests.get(url)
 
     print("STATUS:", response.status_code)
+    
    
 
     data = response.json()
-
+    print(data["features"][0]["geometry"]["coordinates"][0])
+    print("LAST:", data["features"][0]["geometry"]["coordinates"][-1])
     
 
     route = data["features"][0]["properties"]
+    print("GEOMETRY TYPE:")
+    print(data["features"][0]["geometry"]["type"])
 
+    print("FIRST 5:")
+    print(data["features"][0]["geometry"]["coordinates"][:5])
 
     return {
     "distance": round(route["distance"] / 1609, 2),
     "duration": round(route["time"] / 3600, 2),
-    "coordinates": data["features"][0]["geometry"]["coordinates"][::10]
-    }
+
+    "coordinates": 
+        data["features"][0]["geometry"]["coordinates"],
+
+    "current_coordinates": current_coords,
+    "pickup_coordinates": pickup_coords,
+    "dropoff_coordinates": dropoff_coords
+}
