@@ -36,12 +36,18 @@ def get_route_data(current, pickup, dropoff):
 
     response = requests.get(url)
 
+    print("STATUS:", response.status_code)
+   
+
     data = response.json()
+
+    
 
     route = data["features"][0]["properties"]
 
+
     return {
-        "distance": round(route["distance"] / 1609, 2),
-        "duration": round(route["time"] / 3600, 2),
-        "coordinates": data["features"][0]["geometry"]["coordinates"]
+    "distance": round(route["distance"] / 1609, 2),
+    "duration": round(route["time"] / 3600, 2),
+    "coordinates": data["features"][0]["geometry"]["coordinates"][::10]
     }
