@@ -30,15 +30,20 @@ class TripView(APIView):
                 trip.current_cycle_used
             )
 
-            logs = generate_logs()
+            
+            logs = generate_logs(
+                route["duration"]
+)
 
             return Response({
                 "trip_id": trip.id,
                 "distance": route["distance"],
                 "duration": route["duration"],
                 "coordinates": route["coordinates"],
+                "total_days": hos["total_days"],
                 "stops": hos["stops"],
                 "logs": logs
+                
             })
 
         return Response(serializer.errors, status=400)

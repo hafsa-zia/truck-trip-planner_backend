@@ -1,61 +1,75 @@
-def calculate_hos(
-        distance,
-        duration,
-        cycle_hours
-):
+import math
 
-    stops = []
+
+def calculate_hos(distance, duration, cycle_hours):
+
+    remaining_hours = duration
+    remaining_distance = distance
+
     day = 1
 
-    while duration > 0:
+    stops = []
 
-        # Maximum legal driving in a day
-        drive = min(
-            11,
-            duration
-        )
+    # Pickup
+    stops.append({
+        "day": day,
+        "type": "Pickup",
+        "duration": 1
+    })
 
-        # Driving event
+    fuel_counter = 0
+
+    while remaining_hours > 0:
+
+        driving_today = min(11, remaining_hours)
+
         stops.append({
             "day": day,
             "type": "Driving",
-            "duration": drive
+            "duration": round(driving_today, 2)
         })
 
-        # Add 30-minute break after 8+ hours
-        if drive >= 8:
+        if driving_today >= 8:
+
             stops.append({
                 "day": day,
-                "type": "30 Min Break",
+                "type": "30 Minute Break",
                 "duration": 0.5
             })
 
-        duration -= drive
+        fuel_counter += driving_today * 55
 
-        # Add overnight rest if trip continues
-        if duration > 0:
+        if fuel_counter >= 1000:
+
+            stops.append({
+                "day": day,
+                "type": "Fuel Stop",
+                "duration": 0.5
+            })
+
+            fuel_counter = 0
+
+        remaining_hours -= driving_today
+
+        remaining_distance -= driving_today * 55
+
+        if remaining_hours > 0:
+
             stops.append({
                 "day": day,
                 "type": "10 Hour Rest",
                 "duration": 10
             })
 
-        day += 1
-
-    # Pickup and Dropoff
-    stops.insert(0, {
-        "day": 1,
-        "type": "Pickup",
-        "duration": 1
-    })
+            day += 1
 
     stops.append({
-        "day": day - 1,
+        "day": day,
         "type": "Dropoff",
         "duration": 1
     })
 
     return {
-        "distance": distance,
-        "stops": stops
+        "stops": stops,
+        "total_days": day
     }

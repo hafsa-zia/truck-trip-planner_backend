@@ -4,32 +4,20 @@ def generate_logs(duration):
 
     day = 1
 
-    while duration > 0:
+    remaining = duration
 
-        driving = min(
-            11,
-            duration
-        )
+    while remaining > 0:
 
-        log = {
+        driving = min(11, remaining)
+
+        logs.append({
             "day": day,
-            "driving": driving
-        }
+            "off_duty": 24 - driving,
+            "driving": round(driving, 2),
+            "on_duty": 1
+        })
 
-        # Pickup only on first day
-        if day == 1:
-            log["pickup"] = 1
-
-        duration -= driving
-
-        # Add rest if trip continues
-        if duration > 0:
-            log["rest"] = 10
-        else:
-            # Last day
-            log["dropoff"] = 1
-
-        logs.append(log)
+        remaining -= driving
 
         day += 1
 
